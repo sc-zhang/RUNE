@@ -61,7 +61,7 @@ options:
   -i INPUT, --input INPUT
                         Input unique kmer file
   -g GROUP, --group GROUP
-                        Group file for filter unique kmers and draw bars by group
+                        Group file for filtering unique kmers and draw bars by group
   -o OUTPUT, --output OUTPUT
                         Output bar plot
 ```

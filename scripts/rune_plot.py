@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import argparse
 import time
 
-
 mpl.use("Agg")
 
 
@@ -14,7 +13,7 @@ def get_opts():
     group.add_argument(
         "-g",
         "--group",
-        help="Group file for filter unique kmers and draw bars by group",
+        help="Group file for filtering unique kmers and draw bars by group",
         required=True,
     )
     group.add_argument("-o", "--output", help="Output bar plot", required=True)
@@ -81,7 +80,7 @@ def main():
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.xticks([_ for _ in range(len(x_ticks))], x_ticks, fontsize=15, rotation=-90)
-    plt.xlim(-.5, len(x_ticks)-.5)
+    plt.xlim(-.5, len(x_ticks) - .5)
     plt.ylabel("Counts", fontsize=20)
     plt.yticks(fontsize=15)
     plt.savefig(out_pic, bbox_inches="tight")
@@ -91,4 +90,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
