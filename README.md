@@ -50,3 +50,31 @@ options:
 > 1. id of sequence would be cut at first space/tab
 > 2. Only "ATGCN" should be contained in sequence
 > 3. k-mer contain "N" would be dropped
+
+3. rune_plot.py is used for plotting unique kmer counts
+
+```bash
+usage: rune_plot.py [-h] -i INPUT -g GROUP -o OUTPUT
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        Input unique kmer file
+  -g GROUP, --group GROUP
+                        Group file for filter unique kmers and draw bars by group
+  -o OUTPUT, --output OUTPUT
+                        Output bar plot
+```
+
+> Example:
+> ```bash
+> python /path/to/install/scripts/rune_plot.py -i ref.kmers -g group.list -o ref.pdf
+> ```
+> - group.list is a text file contain two columns: group_name, seq_name. The contents of this file is like below, the
+    delimiter should be <kbd>space</kbd> or <kbd>tab</kbd>
+> ```text
+> group1    seq1
+> group1    seq2
+> group2    seq3
+> group2    seq4
+> ```
