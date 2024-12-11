@@ -3,7 +3,6 @@
 //
 
 #include "fasta_io.h"
-#include <iostream>
 
 std::unordered_map<std::string, std::string> fasta_io::read_text() {
   std::unordered_map<std::string, std::string> mp_seq;
