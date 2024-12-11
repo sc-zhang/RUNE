@@ -20,6 +20,9 @@ add_executable(rune src/main.cpp
         src/args.h
 )
 
+find_package(ZLIB)
+target_link_libraries(rune z)
+
 install(TARGETS rune
         DESTINATION bin)
 

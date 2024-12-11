@@ -5,10 +5,12 @@
 #ifndef RUNE_FASTA_IO_H
 #define RUNE_FASTA_IO_H
 #include <algorithm>
+#include <cstring>
 #include <fstream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <zlib.h>
 
 class fasta_io {
 private:
@@ -19,6 +21,8 @@ private:
       return bases.find(base) != bases.end();
     });
   }
+  std::unordered_map<std::string, std::string> read_text();
+  std::unordered_map<std::string, std::string> read_gz();
 
 public:
   explicit fasta_io(std::string file_name) {

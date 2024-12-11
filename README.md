@@ -27,7 +27,7 @@ options:
 ```
 
 1. dump is used for getting unique k-mers with "kmer_size" of each sequences in "input_file", and write into a binary
-   file "output_file".
+   file "output_file". Gzip file supported.
 
 > Example:
 > ```bash
