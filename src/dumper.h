@@ -9,8 +9,8 @@
 #include "bin_io.h"
 #include "fasta_io.h"
 #include "k_bin.h"
-#include "rune.h"
 #include "msg.h"
+#include "rune.h"
 
 class dumper {
 private:
@@ -18,7 +18,7 @@ private:
   std::string kmer_file;
   uint8_t k_size = 0;
   std::unordered_map<std::string, std::string> mp_seq;
-  std::unordered_map<uint64_t, uint32_t> mp_kmer;
+  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> mp_kmer;
   std::unordered_map<std::string, uint32_t> id_sample;
   std::unordered_map<uint32_t, std::string> sample_id;
 
@@ -31,7 +31,7 @@ public:
   }
   void extract();
   void save();
-  std::unordered_map<uint64_t, uint32_t> get_kmer_db();
+  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> get_kmer_db();
   uint32_t get_sample_id(const std::string &sample);
   std::string get_sample_name(const uint32_t &id);
 };

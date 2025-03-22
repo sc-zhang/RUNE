@@ -14,7 +14,7 @@ class loader {
 private:
   std::string kmer_file;
   uint8_t k_size;
-  std::unordered_map<uint64_t, uint32_t> mp_kmer;
+  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> mp_kmer;
   std::unordered_map<std::string, uint32_t> id_sample;
   std::unordered_map<uint32_t, std::string> sample_id;
   bin_io kmer_bin_io;
@@ -27,7 +27,8 @@ public:
   };
   void load();
   void save(const std::string &output_file);
-  std::unordered_map<uint64_t, uint32_t> get_kmer_db() const;
+  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>>
+  get_kmer_db() const;
   uint32_t get_sample_id(const std::string &sample);
   std::string get_sample_name(const uint32_t &id);
 };
