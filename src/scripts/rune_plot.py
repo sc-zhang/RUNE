@@ -155,6 +155,7 @@ def draw_line_plot(args):
             x_ticks.append((offset_list[idx] - offset_list[idx - 1]) // 2 + offset_list[idx - 1])
 
     plt.xticks(x_ticks, chr_order, fontsize=15, rotation=-90)
+    plt.xlim(0, offset_list[-1])
     plt.ylabel("Counts", fontsize=20)
     plt.yticks(fontsize=15)
     plt.ylim(0, max_y * 1.01)
