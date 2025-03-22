@@ -26,7 +26,7 @@ target_link_libraries(rune z)
 install(TARGETS rune
         DESTINATION bin)
 
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/scripts/rune_plot.py"
+install(FILES "src/scripts/rune_plot.py"
         DESTINATION scripts
         PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 
