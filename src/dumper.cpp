@@ -39,16 +39,24 @@ void dumper::extract() {
       uint64_t kbin = kb.get_kbin();
       uint64_t rbin = kb.get_rbin();
       if (!this->mp_kmer.count(kbin)) {
-        this->mp_kmer[kbin] =
-            std::make_pair(this->id_sample[it.first], kb.get_pos());
+        this->mp_kmer[kbin] = 0;
+        this->mp_kmer[kbin] |= id_sample[it.first];
+        this->mp_kmer[kbin] <<= 32;
+        this->mp_kmer[kbin] |= kb.get_pos();
       } else {
-        this->mp_kmer[kbin] = std::make_pair(rune::flag::unknown, 0);
+        this->mp_kmer[kbin] = 0;
+        this->mp_kmer[kbin] |= rune::FLAG::UNKNOWN;
+        this->mp_kmer[kbin] <<= 32;
       }
       if (!this->mp_kmer.count(rbin)) {
-        this->mp_kmer[rbin] =
-            std::make_pair(this->id_sample[it.first], kb.get_pos());
+        this->mp_kmer[rbin] = 0;
+        this->mp_kmer[rbin] |= id_sample[it.first];
+        this->mp_kmer[rbin] <<= 32;
+        this->mp_kmer[rbin] |= kb.get_pos();
       } else {
-        this->mp_kmer[rbin] = std::make_pair(rune::flag::unknown, 0);
+        this->mp_kmer[rbin] = 0;
+        this->mp_kmer[rbin] |= rune::FLAG::UNKNOWN;
+        this->mp_kmer[rbin] <<= 32;
       }
     }
   }
@@ -63,8 +71,7 @@ void dumper::save() {
   bio.write(this->mp_kmer, this->sample_id);
 }
 
-std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>>
-dumper::get_kmer_db() {
+std::unordered_map<uint64_t, uint64_t> dumper::get_kmer_db() {
   return this->mp_kmer;
 }
 uint32_t dumper::get_sample_id(const std::string &sample) {

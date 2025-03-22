@@ -16,9 +16,8 @@ bin_io::bin_io(std::string file_name, uint8_t k_size) {
   this->k_size = k_size;
 }
 
-bool bin_io::write(
-    std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> &mp_kmer,
-    std::unordered_map<uint32_t, std::string> &mp_sample_id) {
+bool bin_io::write(std::unordered_map<uint64_t, uint64_t> &mp_kmer,
+                   std::unordered_map<uint32_t, std::string> &mp_sample_id) {
   fs.open(this->file_name, std::ios_base::out | std::ios_base::binary);
   if (fs) {
     Header header = Header();
@@ -38,12 +37,11 @@ bool bin_io::write(
     }
     for (auto &it : mp_kmer) {
       Record record = Record();
-      if (it.second.first == rune::flag::unknown) {
+      if (((it.second & rune::MASK::ID_MASK) >> 32) == rune::FLAG::UNKNOWN) {
         continue;
       }
       record.kbin = it.first;
-      record.kpos = it.second.second;
-      record.sample_idx = it.second.first;
+      record.sample_idx_kpos = it.second;
       fs.write((char *)&record, sizeof(record));
     }
     fs.close();
@@ -77,8 +75,7 @@ bool bin_io::read() {
     for (uint64_t i = 0; i < header.record_count; ++i) {
       Record record{};
       fs.read((char *)&record, sizeof(record));
-      this->mp_kmer_records[record.kbin].first = record.sample_idx;
-      this->mp_kmer_records[record.kbin].second = record.kpos;
+      this->mp_kmer_records[record.kbin] = record.sample_idx_kpos;
     }
     fs.close();
     return true;

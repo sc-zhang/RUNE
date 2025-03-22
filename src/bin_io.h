@@ -21,8 +21,7 @@ public:
 class Record {
 public:
   uint64_t kbin;
-  uint64_t kpos;
-  uint32_t sample_idx;
+  uint64_t sample_idx_kpos;
 };
 
 class bin_io {
@@ -31,15 +30,14 @@ private:
   std::fstream fs;
 
 public:
-  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> mp_kmer_records;
+  std::unordered_map<uint64_t, uint64_t> mp_kmer_records;
   std::unordered_map<uint32_t, std::string> id_name;
   std::unordered_map<std::string, uint32_t> sample_id;
   uint8_t k_size{};
   explicit bin_io(std::string file_name);
   bin_io(std::string file_name, uint8_t k_size);
-  bool
-  write(std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>> &mp_kmer,
-        std::unordered_map<uint32_t, std::string> &mp_sample_id);
+  bool write(std::unordered_map<uint64_t, uint64_t> &mp_kmer,
+             std::unordered_map<uint32_t, std::string> &mp_sample_id);
   bool read();
 };
 

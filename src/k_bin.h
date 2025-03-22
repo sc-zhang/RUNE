@@ -15,7 +15,7 @@ private:
   uint64_t pos;
   uint64_t kbin;
   uint64_t rbin;
-  const uint64_t MASK;
+  const uint64_t KMER_MASK;
   std::string seq;
   std::unordered_map<char, uint64_t> mp_base = {
       {'A', 0LL}, {'C', 1LL}, {'G', 2LL}, {'T', 3LL}};
@@ -24,7 +24,8 @@ private:
 
 public:
   explicit k_bin(std::string seq, uint8_t k_size = 17)
-      : MASK(k_size < 32 ? ((1LL << (k_size * 2)) - 1) : 0xFFFFFFFFFFFFFFFF) {
+      : KMER_MASK(k_size < 32 ? ((1LL << (k_size * 2)) - 1)
+                              : 0xFFFFFFFFFFFFFFFF) {
     this->seq = std::move(seq);
     this->k_size = k_size;
     this->pos = 0;

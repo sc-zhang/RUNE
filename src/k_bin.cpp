@@ -31,40 +31,40 @@ uint64_t k_bin::rev_bin(uint64_t k_bin) const {
                                                    << 16;
   k_bin = k_bin >> 32 | k_bin << 32;
   k_bin >>= 64 - k_size * 2;
-  return (~k_bin) & MASK;
+  return (~k_bin) & KMER_MASK;
 }
 
 void k_bin::get_kmer() {
   if (this->pos + k_size <= seq.size()) {
-    if (this->pos == 0 || seq[this->pos+k_size-1] == 'N') {
+    if (this->pos == 0 || seq[this->pos + k_size - 1] == 'N') {
       uint64_t npos;
       bool is_valid_kmer = false;
-      while(!is_valid_kmer && this->pos+k_size<=seq.size()){
-        npos = this->pos+k_size;
-        for(uint64_t i=npos-1; i>=this->pos; --i){
-          if(seq[i] == 'N'){
+      while (!is_valid_kmer && this->pos + k_size <= seq.size()) {
+        npos = this->pos + k_size;
+        for (uint64_t i = npos - 1; i >= this->pos; --i) {
+          if (seq[i] == 'N') {
             npos = i;
             break;
           }
-          if(i==0){
+          if (i == 0) {
             break;
           }
         }
-        if(npos==this->pos+k_size){
+        if (npos == this->pos + k_size) {
           this->kbin = kmer2bin(seq.substr(this->pos, k_size));
           this->rbin = rev_bin(this->kbin);
           is_valid_kmer = true;
-        }else{
-          this->pos = npos+1;
+        } else {
+          this->pos = npos + 1;
         }
       }
     } else {
       this->kbin <<= 2;
       this->kbin |= mp_base[seq[pos + k_size - 1]];
-      this->kbin &= MASK;
+      this->kbin &= KMER_MASK;
       this->rbin >>= 2;
       this->rbin |= (~mp_base[seq[pos + k_size - 1]]) << (k_size * 2 - 2);
-      this->rbin &= MASK;
+      this->rbin &= KMER_MASK;
     }
     this->pos++;
   }

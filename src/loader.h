@@ -27,8 +27,7 @@ public:
   };
   void load();
   void save(const std::string &output_file);
-  std::unordered_map<uint64_t, std::pair<uint32_t, uint64_t>>
-  get_kmer_db() const;
+  std::unordered_map<uint64_t, uint64_t> get_kmer_db() const;
   uint32_t get_sample_id(const std::string &sample);
   std::string get_sample_name(const uint32_t &id);
 };
