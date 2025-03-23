@@ -63,7 +63,7 @@ bool bin_io::write(std::unordered_map<uint64_t, uint64_t> &mp_kmer,
     }
 
     header.record_count = keep_record_count;
-    fs.seekg(0, std::ios::beg);
+    fs.seekp(0, std::ios::beg);
     if (!fs.write((char *)&header, sizeof(header))) {
       fs.close();
       return false;
