@@ -21,20 +21,32 @@ bool bin_io::write(std::unordered_map<uint64_t, uint64_t> &mp_kmer,
   fs.open(this->file_name, std::ios_base::out | std::ios_base::binary);
   if (fs) {
     Header header = Header();
+    if (!fs.write((char *)&header, sizeof(header))) {
+      fs.close();
+      return false;
+    }
+
     header.k_size = this->k_size;
     header.sample_count = mp_sample_id.size();
-    header.record_count = mp_kmer.size();
-    fs.write((char *)&header, sizeof(header));
+    header.record_count = 0;
 
     std::vector<std::string> samples(header.sample_count);
+
     for (auto &it : mp_sample_id) {
       samples[it.first - 1] = it.second;
     }
     for (auto &sample : samples) {
       uint16_t id_length = sample.size();
-      fs.write((char *)&id_length, sizeof(id_length));
-      fs.write(sample.c_str(), id_length);
+      if (!fs.write((char *)&id_length, sizeof(id_length))) {
+        fs.close();
+        return false;
+      }
+      if (!fs.write(sample.c_str(), id_length)) {
+        fs.close();
+        return false;
+      }
     }
+    uint64_t keep_record_count = 0;
     for (auto &it : mp_kmer) {
       Record record = Record();
       if (((it.second & rune::MASK::ID_MASK) >> 32) == rune::FLAG::UNKNOWN) {
@@ -42,7 +54,19 @@ bool bin_io::write(std::unordered_map<uint64_t, uint64_t> &mp_kmer,
       }
       record.kbin = it.first;
       record.sample_idx_kpos = it.second;
-      fs.write((char *)&record, sizeof(record));
+      if (fs.write((char *)&record, sizeof(record))) {
+        ++keep_record_count;
+      } else {
+        fs.close();
+        return false;
+      }
+    }
+
+    header.record_count = keep_record_count;
+    fs.seekg(0, std::ios::beg);
+    if (!fs.write((char *)&header, sizeof(header))) {
+      fs.close();
+      return false;
     }
     fs.close();
     return true;
@@ -78,6 +102,9 @@ bool bin_io::read() {
       this->mp_kmer_records[record.kbin] = record.sample_idx_kpos;
     }
     fs.close();
+    if (this->mp_kmer_records.size() != header.record_count) {
+      return false;
+    }
     return true;
   } else {
     return false;

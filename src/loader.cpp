@@ -9,9 +9,10 @@ void loader::load() {
   k_bin kb = k_bin("", k_size);
   bool is_valid = kmer_bin_io.read();
   if (is_valid) {
-    message.info("Loaded");
+    message.info(std::to_string(kmer_bin_io.mp_kmer_records.size()) +
+                 " Unique kmer Loaded");
   } else {
-    message.err("Invalid binary file, exiting...");
+    message.err("Invalid or incomplete binary file, exiting...");
     exit(-1);
   }
 }
@@ -28,6 +29,7 @@ void loader::save(const std::string &output_file) {
        << this->get_sample_name((it.second & rune::MASK::ID_MASK) >> 32) << "\t"
        << (it.second & rune::MASK::POS_MASK) << "\n";
   }
+  fs.close();
 }
 std::unordered_map<uint64_t, uint64_t> loader::get_kmer_db() const {
   return this->kmer_bin_io.mp_kmer_records;

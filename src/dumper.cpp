@@ -68,7 +68,12 @@ void dumper::save() {
   msg message = msg(true);
   message.info("Writing k-mers");
   bin_io bio = bin_io(this->kmer_file, this->k_size);
-  bio.write(this->mp_kmer, this->sample_id);
+  if (bio.write(this->mp_kmer, this->sample_id)) {
+    message.info("Kmer dumped");
+  } else {
+    message.err("Kmer written failed, exiting...");
+    exit(-1);
+  }
 }
 
 std::unordered_map<uint64_t, uint64_t> dumper::get_kmer_db() {
