@@ -30,6 +30,7 @@ void loader::save(const std::string &output_file) {
        << (it.second & rune::MASK::POS_MASK) << "\n";
   }
   fs.close();
+  message.info("Kmer saved");
 }
 std::unordered_map<uint64_t, uint64_t> loader::get_kmer_db() const {
   return this->kmer_bin_io.mp_kmer_records;
