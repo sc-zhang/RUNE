@@ -20,6 +20,7 @@ def get_opts():
         help="Group file for filtering unique kmers and draw bars by group",
         required=True,
     )
+    parser_bar_plot.add_argument("-l", "--length", help="Input sequence length file", required=True)
     parser_bar_plot.add_argument("-o", "--output", help="Output bar plot", required=True)
     parser_bar_plot.set_defaults(func=draw_bar_plot)
 
@@ -43,6 +44,7 @@ def time_print(info):
 def draw_bar_plot(args):
     in_uniq_kmer_file = args.input
     in_grp_file = args.group
+    in_len_file = args.length
     out_pic = args.output
     time_print("Loading group file")
     grp_order = []
@@ -58,6 +60,13 @@ def draw_bar_plot(args):
                 grp_order.append(grp)
             grp_db[grp].append(smp)
             smp_set.add(smp)
+
+    time_print("Loading length file")
+    len_db = {}
+    with open(in_len_file, 'r') as fin:
+        for line in fin:
+            data = line.strip().split()
+            len_db[data[0]] = int(data[1])
 
     time_print("Loading kmer file")
     cnt_db = {}
@@ -81,7 +90,7 @@ def draw_bar_plot(args):
     for grp in grp_order:
         plt.bar(
             x=[_ for _ in range(idx, idx + len(grp_db[grp]))],
-            height=[cnt_db[_] for _ in grp_db[grp]],
+            height=[cnt_db[_] * 1. / len_db[_] for _ in grp_db[grp]],
             width=0.8,
         )
         idx += len(grp_db[grp])
@@ -92,7 +101,7 @@ def draw_bar_plot(args):
     ax.spines["right"].set_visible(False)
     plt.xticks([_ for _ in range(len(x_ticks))], x_ticks, fontsize=15, rotation=-90)
     plt.xlim(-.5, len(x_ticks) - .5)
-    plt.ylabel("Counts", fontsize=20)
+    plt.ylabel("Counts/Length", fontsize=20)
     plt.yticks(fontsize=15)
     plt.savefig(out_pic, bbox_inches="tight")
 
@@ -156,6 +165,7 @@ def draw_line_plot(args):
 
     plt.xticks(x_ticks, chr_order, fontsize=15, rotation=-90)
     plt.xlim(0, offset_list[-1])
+    plt.xlabel("Bins", fontsize=20)
     plt.ylabel("Counts", fontsize=20)
     plt.yticks(fontsize=15)
     plt.ylim(0, max_y * 1.01)
