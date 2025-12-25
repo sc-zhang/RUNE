@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import math
 import argparse
 import time
+import subprocess
+import sys
 
 mpl.use("Agg")
 
@@ -13,22 +15,38 @@ def get_opts():
     subparsers = parser.add_subparsers(title="sub commands")
 
     parser_bar_plot = subparsers.add_parser("bar", help="Draw bar plot")
-    parser_bar_plot.add_argument("-i", "--input", help="Input unique kmer file", required=True)
+    parser_bar_plot.add_argument(
+        "-i", "--input", help="Input unique kmer file, could be *.kbin/*.kmers",
+        required=True
+    )
     parser_bar_plot.add_argument(
         "-g",
         "--group",
         help="Group file for filtering unique kmers and draw bars by group",
         required=True,
     )
-    parser_bar_plot.add_argument("-l", "--length", help="Input sequence length file", required=True)
-    parser_bar_plot.add_argument("-o", "--output", help="Output bar plot", required=True)
+    parser_bar_plot.add_argument(
+        "-l", "--length", help="Input sequence length file", required=True
+    )
+    parser_bar_plot.add_argument(
+        "-o", "--output", help="Output bar plot", required=True
+    )
     parser_bar_plot.set_defaults(func=draw_bar_plot)
 
     parser_line_plot = subparsers.add_parser("line", help="Draw line plot")
-    parser_line_plot.add_argument("-i", "--input", help="Input unique kmer file", required=True)
-    parser_line_plot.add_argument("-l", "--length", help="Input sequence length file", required=True)
-    parser_line_plot.add_argument("-w", "--window", help="Window size, default=1e5", default="1e5")
-    parser_line_plot.add_argument("-o", "--output", help="Output line plot", required=True)
+    parser_line_plot.add_argument(
+        "-i", "--input", help="Input unique kmer file, could be *.kbin/*.kmers",
+        required=True
+    )
+    parser_line_plot.add_argument(
+        "-l", "--length", help="Input sequence length file", required=True
+    )
+    parser_line_plot.add_argument(
+        "-w", "--window", help="Window size, default=1e5", default="1e5"
+    )
+    parser_line_plot.add_argument(
+        "-o", "--output", help="Output line plot", required=True
+    )
     parser_line_plot.set_defaults(func=draw_line_plot)
 
     return parser
@@ -63,21 +81,49 @@ def draw_bar_plot(args):
 
     time_print("Loading length file")
     len_db = {}
-    with open(in_len_file, 'r') as fin:
+    with open(in_len_file, "r") as fin:
         for line in fin:
             data = line.strip().split()
             len_db[data[0]] = int(data[1])
 
     time_print("Loading kmer file")
     cnt_db = {}
-    with open(in_uniq_kmer_file, "r") as fin:
-        for line in fin:
-            data = line.strip().split()
+    if in_uniq_kmer_file.endswith(".kbin"):
+        is_binary = True
+    else:
+        is_binary = False
+    if is_binary:
+        cmd = [
+            "%s/../bin/rune" % (sys.path[0]),
+            "load",
+            "-i",
+            in_uniq_kmer_file,
+        ]
+        time_print("Running %s" % (" ".join(cmd)))
+        p = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=None,
+            text=True,
+            bufsize=1,
+        )
+        fin = p.stdout
+    else:
+        fin = open(in_uniq_kmer_file, "r")
+    for line in fin:
+        data = line.strip().split()
+        try:
             if data[1] not in smp_set:
                 continue
             if data[1] not in cnt_db:
                 cnt_db[data[1]] = 0
             cnt_db[data[1]] += 1
+        except Exception as e:
+            print(line)
+            print(e)
+    if is_binary:
+        p.wait()
+    fin.close()
 
     time_print("Plotting bar plot")
     scnt = len(cnt_db)
@@ -90,7 +136,7 @@ def draw_bar_plot(args):
     for grp in grp_order:
         plt.bar(
             x=[_ for _ in range(idx, idx + len(grp_db[grp]))],
-            height=[cnt_db[_] * 1. / len_db[_] for _ in grp_db[grp]],
+            height=[cnt_db[_] * 1.0 / len_db[_] for _ in grp_db[grp]],
             width=0.8,
         )
         idx += len(grp_db[grp])
@@ -100,7 +146,7 @@ def draw_bar_plot(args):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     plt.xticks([_ for _ in range(len(x_ticks))], x_ticks, fontsize=15, rotation=-90)
-    plt.xlim(-.5, len(x_ticks) - .5)
+    plt.xlim(-0.5, len(x_ticks) - 0.5)
     plt.ylabel("Counts/Length", fontsize=20)
     plt.yticks(fontsize=15)
     plt.savefig(out_pic, bbox_inches="tight")
@@ -117,22 +163,50 @@ def draw_line_plot(args):
     time_print("Loading length file")
     len_db = {}
     chr_order = []
-    with open(in_len_file, 'r') as fin:
+    with open(in_len_file, "r") as fin:
         for line in fin:
             data = line.strip().split()
             len_db[data[0]] = int(data[1])
             chr_order.append(data[0])
 
     time_print("Loading kmer file")
-    region_cnt_db = {chrn: [0 for _ in range(math.ceil(len_db[chrn] * 1. / win_size))] for chrn in len_db}
-    with open(in_uniq_kmer_file, "r") as fin:
-        for line in fin:
-            data = line.strip().split()
-            if data[1] not in len_db:
-                continue
-            pos = int(data[2])
-            idx = int(pos * 1. / win_size)
-            region_cnt_db[data[1]][idx] += 1
+    region_cnt_db = {
+        chrn: [0 for _ in range(math.ceil(len_db[chrn] * 1.0 / win_size))]
+        for chrn in len_db
+    }
+    if in_uniq_kmer_file.endswith(".kbin"):
+        is_binary = True
+    else:
+        is_binary = False
+    if is_binary:
+        cmd = [
+            "%s/../bin/rune" % (sys.path[0]),
+            "load",
+            "-i",
+            in_uniq_kmer_file,
+        ]
+        time_print("Running %s" % (" ".join(cmd)))
+        p = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=None,
+            text=True,
+            bufsize=1,
+        )
+        fin = p.stdout
+    else:
+        fin = open(in_uniq_kmer_file, "r")
+    for line in fin:
+        data = line.strip().split()
+        if data[1] not in len_db:
+            continue
+        pos = int(data[2])
+        idx = int(pos * 1.0 / win_size)
+        region_cnt_db[data[1]][idx] += 1
+
+    if is_binary:
+        p.wait()
+    fin.close()
 
     time_print("Plotting line plot")
     cnt = len(region_cnt_db)
@@ -151,7 +225,7 @@ def draw_line_plot(args):
         offset_list.append(offset)
 
     for offset in offset_list[:-1]:
-        plt.plot([offset, offset], [0, max_y], lw=3, color='lightgrey', ls=":")
+        plt.plot([offset, offset], [0, max_y], lw=3, color="lightgrey", ls=":")
 
     ax = plt.gca()
     ax.spines["top"].set_visible(False)
@@ -161,7 +235,9 @@ def draw_line_plot(args):
         if idx == 0:
             x_ticks.append(offset_list[idx] // 2)
         else:
-            x_ticks.append((offset_list[idx] - offset_list[idx - 1]) // 2 + offset_list[idx - 1])
+            x_ticks.append(
+                (offset_list[idx] - offset_list[idx - 1]) // 2 + offset_list[idx - 1]
+            )
 
     plt.xticks(x_ticks, chr_order, fontsize=15, rotation=-90)
     plt.xlim(0, offset_list[-1])
@@ -176,6 +252,7 @@ def draw_line_plot(args):
 
 def main():
     parser = get_opts()
+
     try:
         args = parser.parse_args()
         args.func(args)

@@ -74,16 +74,14 @@ sub commands:
 - bar plot
 
 ```bash
-usage: rune_plot.py bar [-h] -i INPUT -g GROUP -o OUTPUT
+usage: rune_plot.py bar [-h] -i INPUT -g GROUP -l LENGTH -o OUTPUT
 
 options:
-  -h, --help            show this help message and exit
-  -i INPUT, --input INPUT
-                        Input unique kmer file
-  -g GROUP, --group GROUP
-                        Group file for filtering unique kmers and draw bars by group
-  -o OUTPUT, --output OUTPUT
-                        Output bar plot
+  -h, --help           show this help message and exit
+  -i, --input INPUT    Input unique kmer file, could be *.kbin/*.kmers
+  -g, --group GROUP    Group file for filtering unique kmers and draw bars by group
+  -l, --length LENGTH  Input sequence length file
+  -o, --output OUTPUT  Output bar plo
 ```
 
 > Example:
@@ -105,15 +103,11 @@ options:
 usage: rune_plot.py line [-h] -i INPUT -l LENGTH [-w WINDOW] -o OUTPUT
 
 options:
-  -h, --help            show this help message and exit
-  -i INPUT, --input INPUT
-                        Input unique kmer file
-  -l LENGTH, --length LENGTH
-                        Input sequence length file
-  -w WINDOW, --window WINDOW
-                        Window size, default=1e5
-  -o OUTPUT, --output OUTPUT
-                        Output line plot
+  -h, --help           show this help message and exit
+  -i, --input INPUT    Input unique kmer file, could be *.kbin/*.kmers
+  -l, --length LENGTH  Input sequence length file
+  -w, --window WINDOW  Window size, default=1e5
+  -o, --output OUTPUT  Output line plot
 ```
 
 > Example:
