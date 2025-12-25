@@ -14,6 +14,11 @@ int main(int argc, char *argv[]) {
       kmer_loader.load();
       kmer_loader.save(arguments.output_file);
     } else if (arguments.operate == "dump") {
+      if (arguments.output_file.empty()) {
+        message.err(
+            "dump could not work if no output file provided, aborting...");
+        exit(-1);
+      }
       dumper kmer_dumper =
           dumper(arguments.input_file, arguments.k_size, arguments.output_file);
       kmer_dumper.extract();

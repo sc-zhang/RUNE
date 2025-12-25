@@ -53,7 +53,8 @@ args::args(int argc, char **argv) {
             this->k_size += c - '0';
           }
           if (this->k_size < 3 || this->k_size > 32) {
-            std::cout << "Invalid kmer size, should be [3, 32]" << std::endl;
+            std::cout << "Invalid kmer size, should be in range of [3, 32]"
+                      << std::endl;
             is_valid = false;
             break;
           }
@@ -65,14 +66,15 @@ args::args(int argc, char **argv) {
       }
     }
   }
-  if (!is_valid || this->input_file.empty() || this->output_file.empty()) {
+  if (!is_valid || this->input_file.empty()) {
     std::string help_string =
         "usage: rune [-h] {dump,load} -i input_file -k "
         "kmer_size -o output_file\n"
         "options:\n"
         "  -h, --help        show this help message and exit\n"
         "  -i input_file     Input file\n"
-        "  -k kmer_size      kmer size, should be [3, 32], default=25\n"
+        "  -k kmer_size      kmer size, only for dump, "
+        "should be [3, 32], default=25\n"
         "  -o output_file    Output file\n";
     std::cout << help_string << std::endl;
     this->args_enough = false;
